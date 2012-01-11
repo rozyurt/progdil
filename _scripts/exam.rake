@@ -2,39 +2,43 @@ require 'erb'
 require 'yaml'
 
 task :exam do
-	Dir.foreach("_exams") do |dizin|
-		if not (dizin == '.' || dizin == '..')
-			puts dizin
-	config = YAML.load_file("_exams/" + dizin)
-	isim = config["title"]
-	#puts isim
-	
-	sorular=config["q"]
-	#puts sorular
+	Dir.foreach("_exams") do |directory|
+		if not (directory == '.' || directory == '..')
+			puts directory
 
-	alt_kisim=config["footer"]
-	#puts alt_kisim
+	yaml_file = YAML.load_file("_exams/" + directory)
+	name = yaml_file["title"]
+	#puts name
+	
+	questions = yaml_file["q"]
+	#puts questions
+
+	footer = yaml_file["footer"]
+	#puts footer
 		
-	j=0
+	j = 0
 	liste=[]
-	for i in sorular
-		a = File.read("_includes/q/" + i )
-		liste[j] = a
+	for i in questions
+		inc = File.read("_includes/q/" + i )
+		liste[j] = inc
 		#puts liste[j]
 		j = j + 1
-end
+	end
 
-	oku_erb = File.read("_templates/exam.md.erb")
-	#puts oku_erb
+	read_erb = File.read("_templates/exam.md.erb")
+	#puts read_erb
 
 	f = File.open("sinav.md","w")
-	new = ERB.new(oku_erb)
+	new = ERB.new(read_erb)
 	f.write(new.result(binding))
 	f.close
 
 	sh "markdown2pdf sinav.md"
 	sh "rm sinav.md"
-end
-end
+
+
+		end
+	end
 end	
+
 task:default => :exam
